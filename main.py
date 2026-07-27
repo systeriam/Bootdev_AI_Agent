@@ -26,6 +26,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="AI Assistant")
     parser.add_argument("user_prompt", type=str, help="Input prompt:")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     args = parser.parse_args()
     # Now we can access `args.user_prompt`    
 
@@ -34,15 +35,20 @@ def main():
     response = client.chat.completions.create(model="openrouter/free", messages = [
         {
             "role": "user",
-            "content": f"{args.user_prompt}",
+            "content": args.user_prompt,
         }
     ])
-    if response.usage is not None:
-        print(f"Prompt tokens: {response.usage.prompt_tokens}")
-        print(f"Response tokens: {response.usage.completion_tokens}")
+    if args.verbose == True:
+        print(f"User prompt: {args.user_prompt}")
+        print(response.choices[0].message.content)
+        if response.usage is not None:
+            print(f"Prompt tokens: {response.usage.prompt_tokens}")
+            print(f"Response tokens: {response.usage.completion_tokens}")
+        else:
+            raise RuntimeError("Failed API request!")
     else:
-        raise RuntimeError("Failed API request!")
-    print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
+
 
 
 
