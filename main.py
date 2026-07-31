@@ -1,8 +1,8 @@
 import os
+import argparse
 from dotenv import load_dotenv
 from openai import OpenAI
-import argparse
-
+from prompts import system_prompt
 
 
 def main():
@@ -32,12 +32,14 @@ def main():
 
 # The actual response from the client
 
-    response = client.chat.completions.create(model="openrouter/free", messages = [
-        {
-            "role": "user",
-            "content": args.user_prompt,
-        }
-    ])
+    response = client.chat.completions.create(
+        model="openrouter/free", 
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": args.user_prompt}
+        ],
+        temperature=0
+        )
     if args.verbose == True:
         print(f"User prompt: {args.user_prompt}")
         print(response.choices[0].message.content)
