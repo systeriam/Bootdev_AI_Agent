@@ -4,7 +4,7 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import system_prompt
-from call_function import available_functions
+from call_function import *
 
 def main():
 # Load environmental variables from .env
@@ -45,26 +45,38 @@ def main():
 
     message = response.choices[0].message
 
+    
+
 
 # Call available functions, if applicable
     if message.tool_calls is not None:
         for tool_call in message.tool_calls:
-            function_args = json.loads(tool_call.function.arguments or "{}")
-            print(f"Calling function: {tool_call.function.name}({function_args})")
+            result_message = call_function(tool_call, args.verbose)
+            if not result_message["content"]:
+                raise Exception("Tool message is empty")
+            if args.verbose:
+                print(f"-> {result_message['content']}")
+            
 
-
-# If verbose is set, print extra data
+ # If verbose is set, print extra data
 # Otherwise just print response
+    
+    if response.choices[0].message.content is not None:
+            print(response.choices[0].message.content)
+    
+
     if args.verbose == True:
-        print(f"User prompt: {args.user_prompt}")
-        print(response.choices[0].message.content)
         if response.usage is not None:
+            print("VERBOSE:")
+            print(f"User prompt: {args.user_prompt}")
             print(f"Prompt tokens: {response.usage.prompt_tokens}")
             print(f"Response tokens: {response.usage.completion_tokens}")
         else:
             raise RuntimeError("Failed API request!")
-    else:
-        print(response.choices[0].message.content)
+    
+                    
+            
+                
 
 
 

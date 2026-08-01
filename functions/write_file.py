@@ -1,5 +1,9 @@
 import os
 
+
+# JSON Schemas are kinda confusing, yo
+# One big nested python dictionary of strings written in javascript syntax
+# so that the LLM can interpret, or something of that effect
 schema_write_file = {
     "type": "function",
     "function": {
@@ -35,7 +39,8 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
         if is_directory:
             return f'Error: Cannot write to "{file_path}" as it is a directory'
 
-        os.makedirs(file_path, exist_ok=True)
+        print(repr(os.path.dirname(target_path)))
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
 
         with open(target_path, "w") as file:
                     file.write(content)
