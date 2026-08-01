@@ -1,9 +1,10 @@
 import os
 import argparse
+import json
 from dotenv import load_dotenv
 from openai import OpenAI
 from prompts import system_prompt
-
+from call_function import available_functions
 
 def main():
 # Load environmental variables from .env
@@ -38,8 +39,22 @@ def main():
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": args.user_prompt}
         ],
+        tools=available_functions,
         temperature=0
         )
+
+    message = response.choices[0].message
+
+
+# Call available functions, if applicable
+    if message.tool_calls is not None:
+        for tool_call in message.tool_calls:
+            function_args = json.loads(tool_call.function.arguments or "{}")
+            print(f"Calling function: {tool_call.function.name}({function_args})")
+
+
+# If verbose is set, print extra data
+# Otherwise just print response
     if args.verbose == True:
         print(f"User prompt: {args.user_prompt}")
         print(response.choices[0].message.content)
